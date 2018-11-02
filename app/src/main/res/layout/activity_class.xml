@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="江苏林业学院课程表"
+        android:textSize="30sp"
+        android:textColor="#000000"
+        android:gravity="center" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:text="上课时间:"
+            android:textSize="20sp"
+            android:textColor="#000000"/>
+        <Spinner
+            android:id="@+id/semester"
+            android:layout_width="match_parent"
+            android:entries="@array/spingarr"
+            android:layout_height="wrap_content">
+        </Spinner>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:text="教师:"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="#000000"/>
+        <Spinner
+            android:id="@+id/teacher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </Spinner>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="100sp"
+            android:layout_height="wrap_content"
+            android:text="验证码:"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="#000000"/>
+        <EditText
+            android:id="@+id/securitycode"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/img_securitycode"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:background="#FFFFFF"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/toSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:alpha="0.7"
+            android:layout_weight="1"
+            android:background="@drawable/buttonstyle"
+            android:text="查    询"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="200dp"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/insert"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="50dp"-->
+            <!--android:text="insert"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/sname"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="aaa" />-->
+        <!--<TextView-->
+            <!--android:id="@+id/spassword"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
+
+    <!--</LinearLayout>-->
+
+</LinearLayout>
