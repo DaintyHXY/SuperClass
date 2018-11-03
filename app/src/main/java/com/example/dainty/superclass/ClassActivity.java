@@ -21,6 +21,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +41,8 @@ public class ClassActivity extends Activity {
     private MyDataBaseHelper myDataBaseHelper;
 
     public static final int UPDATE_PIC = 99;
+    public static final int AUTO_CODE=2;
+    private static final int Error_Valicode = 69;
 
     private Data data = new Data();
 
@@ -44,7 +50,7 @@ public class ClassActivity extends Activity {
     private Spinner semester;
     private Spinner teacher;
     private String sem;
-    private String teacherName;
+    private String teacherName="WP00224";
     private String security;
 
 
@@ -78,11 +84,80 @@ public class ClassActivity extends Activity {
                 case UPDATE_PIC:
                     //更新验证码
                     identifyCode.setImageBitmap(identifyPicture);
+                    autoIdentity();
+                    break;
+                case AUTO_CODE:
+                    securityCode=findViewById(R.id.securitycode);
+                    securityCode.setText(msg.getData().get("autocode").toString());
             }
 
         }
 
     };
+    private Handler handler3=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+           if(msg.what==Error_Valicode){
+               Toast.makeText(ClassActivity.this,"nidacuole",Toast.LENGTH_SHORT).show();
+               getCookieAndValidateCode();
+           }
+           else if(msg.what==3){
+               //进下一个
+               //跳转到下一页面，并将学期和教师数据传输给下一个页面
+                Intent intent = new Intent(ClassActivity.this,CourseActivity.class);
+
+               //sem = "20180";
+//               teacherName = "0000315";
+
+               intent.putExtra("semester",sem);
+               intent.putExtra("teacher",teacherName);
+                intent.putExtra("yzm",security);
+
+                //intent.putExtra("classTable",rowsList);
+
+               startActivity(intent);
+
+           }
+        }
+    };
+
+    private void autoIdentity() {
+        new Thread(){
+
+            public void run(){
+
+
+                String username="qq563088";
+                String password="lzx1314520";
+                String softid="1e4318d5bf6608c2a403f97ea97d52bc";
+                String codetype="1902";
+                String cj_filePath="/sdcard/k.png";
+                String len_min="0";
+                String use_Code="";
+                String returnCode=new ChaoJiYing().PostPic(username,password,softid,codetype,len_min,cj_filePath);//解析下Json
+                JSONObject jsonObject= null;
+                try {
+                    jsonObject = new JSONObject(returnCode);
+                    use_Code=jsonObject.getString("pic_str");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.i("bear",use_Code+"  use ");
+                Message msg=new Message();
+                Bundle bundle=new Bundle();
+                bundle.putString("autocode",use_Code);
+                msg.setData(bundle);
+                msg.what=2;
+                handler2.sendMessage(msg);
+            }
+
+
+
+        }.start();
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,34 +167,33 @@ public class ClassActivity extends Activity {
         PermissionUtils.verifyStoragePermissions(this);
 
         search = (Button)findViewById(R.id.toSearch);
-//        insert = (Button)findViewById(R.id.insert);
-//        sName = (TextView)findViewById(R.id.sname);
-//        sPassword = (TextView)findViewById(R.id.spassword);
-
 
         semester = (Spinner)findViewById(R.id.semester);
         teacher = (Spinner)findViewById(R.id.teacher);
 
         identifyCode = (ImageView)findViewById(R.id.img_securitycode);
+        identifyCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getCookieAndValidateCode();
+            }
+        });
 
         getCookieAndValidateCode();
 
         securityCode = (EditText)findViewById(R.id.securitycode);
 
         //创建数据库
-        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,1);
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,2);
         //myDataBaseHelper.getWritableDatabase();
 
-//        //验证码图片
-//        identifyPicture  = dataProcess.getCookieAndValidateCode(teacherName,sem);
-//        identifyCode = (ImageView) findViewById(R.id.img_securitycode);
-//        identifyCode.setImageBitmap(identifyPicture);
 
         //学期和教师名字选中
         semester.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 sem = (String) semester.getSelectedItem();
+                sem = semesterProcess(sem);
                 Log.d("info","semester:"+sem);
             }
 
@@ -133,6 +207,7 @@ public class ClassActivity extends Activity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 teacherName = (String) teacher.getSelectedItem();
+//                teacherName="";
                 Log.d("info","teacher:"+teacherName);
 
             }
@@ -144,58 +219,33 @@ public class ClassActivity extends Activity {
         });
 
         search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                                      @Override
+                                      public void onClick(View v) {
 
-//                try {
-//                    getScheduleByTea(v);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
 
                  security = securityCode.getText().toString();
-                //跳转到下一页面，并将学期和教师数据传输给下一个页面
-                Intent intent = new Intent(ClassActivity.this,CourseActivity.class);
+                                          try {
+                                              getScheduleByTea();
+                                          } catch (Exception e) {
+                                              e.printStackTrace();
+                                          }
+                                          //跳转到下一页面，并将学期和教师数据传输给下一个页面
+                                         // Intent intent = new Intent(ClassActivity.this,CourseActivity.class);
 
-                intent.putExtra("semester",sem);
-                intent.putExtra("teacher",teacherName);
-                intent.putExtra("yzm",security);
+                                          //sem = "20180";
+//                                          teacherName = "0000315";
 
-               // intent.putExtra("classTable",rowsList);
+                                         // intent.putExtra("semester",sem);
+                                         // intent.putExtra("teacher",teacherName);
+                                         // intent.putExtra("yzm",security);
 
-                startActivity(intent);
+                                          // intent.putExtra("classTable",rowsList);
+
+                                          //startActivity(intent);
 
             }
         });
 
-//        //数据库简单测试
-//        insert.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
-//                ContentValues values = new ContentValues();
-//                values.put("sName","huang");
-//                values.put("sPassword","123");
-//                db.insert("Student",null,values);
-//                Log.d("info","inset success");
-//
-//                Cursor cursor = db.query("Student",null,null,null,null,null,null);
-//                if(cursor.moveToFirst()){
-//
-//                    do{
-//                        String name = cursor.getString(cursor.getColumnIndex("sName"));
-//                        String password = cursor.getString(cursor.getColumnIndex("sPassword"));
-//                        sName.setText(name);
-//                        sPassword.setText(password);
-//                     }while (cursor.moveToNext());
-//
-//                }
-//
-//
-//                cursor.close();
-//
-//            }
-//        });
 
 
     }
@@ -257,58 +307,136 @@ public class ClassActivity extends Activity {
 
     }
 
+    public  void getScheduleByTea()throws Exception{
+        new Thread(){
+            public void run(){
+                try{
+                    String yzm=security;
+                    Log.i("bear",yzm+"->yzm");
+
+                    String cookie="";
+                    SharedPreferences sharedPreferences=getSharedPreferences("mycookie", Context.MODE_PRIVATE);
+                    cookie=sharedPreferences.getString("cookie","wrong!");
+                    Log.i("bear",cookie+"cookie"+"real using cookie");
+                    System.out.println(cookie);
+                    String referer="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB.aspx";
+                    String address="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB_rpt.aspx";
+                    URL url=new URL(address);
+                    HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+                    connection.setDoInput(true);
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Cookie", cookie);
+                    connection.setRequestProperty("Referer", referer);
+                    StringBuilder builder=new StringBuilder();
+                    builder.append("Sel_XNXQ=20180&Sel_JS="+teacherName+"&type=1&txt_yzm="+yzm);
+                    OutputStream outputStream=connection.getOutputStream();
+                    outputStream.write(builder.toString().getBytes());
+                    int len=connection.getContentLength();
+                    System.out.println(len);
+                    byte[]buf=new byte[512];
+                    File file=new File("/sdcard/aa1.txt");
+
+                    InputStream inputStream=connection.getInputStream();
+                    OutputStream outputStream2=new FileOutputStream(file);
+                    while((len=inputStream.read(buf))!=-1)
+                    {
+                        outputStream2.write(buf, 0, len);
+
+                    }
+                    inputStream.close();
+                    outputStream2.close();
 
 
-//    public  void getScheduleByTea(View view)throws Exception{
-//        new Thread(){
-//            public void run(){
-//                try{
-//                    String yzm=securityCode.getText().toString();
-//                    Log.i("bear",yzm+"->yzm");
-//
-//                    String cookie="";
-//                    SharedPreferences sharedPreferences=getSharedPreferences("mycookie",Context.MODE_PRIVATE);
-//                    cookie=sharedPreferences.getString("cookie","wrong!");
-//                    Log.i("bear",cookie+"cookie"+"real using cookie");
-//                    System.out.println(cookie);
-//                    String referer="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB.aspx";
-//                    String address="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB_rpt.aspx";
-//                    URL url=new URL(address);
-//                    HttpURLConnection connection=(HttpURLConnection)url.openConnection();
-//                    connection.setDoInput(true);
-//                    connection.setDoOutput(true);
-//                    connection.setRequestMethod("POST");
-//                    connection.setRequestProperty("Cookie", cookie);
-//                    connection.setRequestProperty("Referer", referer);
-//                    StringBuilder builder=new StringBuilder();
-//                    builder.append("Sel_XNXQ=20180&Sel_JS=0000315&type=1&txt_yzm="+yzm);
-//                    OutputStream outputStream=connection.getOutputStream();
-//                    outputStream.write(builder.toString().getBytes());
-//                    int len=connection.getContentLength();
-//                    System.out.println(len);
-//                    byte[]buf=new byte[512];
-//                    File file=new File("/sdcard/aa1.txt");
-//
-//                    InputStream inputStream=connection.getInputStream();
-//                    OutputStream outputStream2=new FileOutputStream(file);
-//                    while((len=inputStream.read(buf))!=-1)
-//                    {
-//                        outputStream2.write(buf, 0, len);
-//
-//                    }
-//                    inputStream.close();
-//                    outputStream2.close();
-//                    handler.sendEmptyMessage(1);
-//
-//
-//                   rowsList = data.parseHtml();
-//                }
-//                catch (Exception e){
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        }.start();}
+                    rowsList = data.parseHtml();
+                    //判断rowsList传来的信息是什么
+                    //1.空表  那就啥也不干  直接进界面
+                    //2.验证码错误  这个时候list的size==1
+
+                    if(rowsList.size()!=0)
+                    {
+                        if(rowsList.get(0).get(0).equals("error_code")){
+                            //todo   通知验证码错误
+                            handler3.sendEmptyMessage(Error_Valicode);
+                        }
+
+                        //第三种情况  真的有表
+                        else{
+
+                            Log.d("databasein","start into database");
+                            for (int i = 0; i < rowsList.size(); i++) {
+                                for (int j = 0; j < rowsList.get(i).size(); j++) {
+                                    if (rowsList.get(i).get(j).equals("")) System.out.print("无课");
+                                    else {
+
+                                        String classtable = rowsList.get(i).get(j);
+                                        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put("classLine", i);
+                                        values.put("classColumn",j );
+                                        values.put("teacherName",teacherName);
+                                        values.put("semester",sem);
+                                        values.put("inClass",classtable);
+                                        db.insert("ClassTable", null, values);
+
+                                        Log.d("course",""+rowsList.get(i).get(j));
+                                        System.out.print(rowsList.get(i).get(j));
+                                    }
+                                    System.out.print(" ");
+
+                                }
+                                System.out.println("");
+
+                            }
+                           //进下一个
+                            handler3.sendEmptyMessage(3);
+
+
+
+                        }
+
+                    }
+                    else {
+                        //进下一个
+                        handler3.sendEmptyMessage(3);
+
+                    }
+                    //rowlist存入数据库
+
+
+//                    Log.d("info","size"+rowsList.size());
+
+
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();}
+
+    public String semesterProcess(String semester){
+
+        String year="";
+
+        for (int i=0;i<4;i++){
+            year += semester.charAt(i);
+        }
+
+        String seme="";
+        seme += semester.charAt(12);
+        if(seme.equals("一"))
+            seme = "0";
+        else if(seme.equals("二"))
+                seme = "1";
+        else Log.d("semesterProcess","process error:"+seme);
+
+        return year+seme;
+
+    }
+
+
 }
 
 

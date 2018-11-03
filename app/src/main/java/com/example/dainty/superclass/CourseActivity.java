@@ -1,15 +1,20 @@
 package com.example.dainty.superclass;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,68 +29,41 @@ public class CourseActivity extends Activity {
 
     private String teacherName;
     private String semesterTime;
-
+    private GridAdaptor ga;
+    private String[][] contents;
+    private List<String> dataList;
+    private GridView gv ;
     private static final int GETLIST = 70;
+    private static final int Error_Valicode = 69;
+
+    private MyDataBaseHelper myDataBaseHelper;
 
     private Handler handler = new Handler(){
 
         public void handleMessage(Message msg){
 
             switch (msg.what){
-                case GETLIST:
-                    Bundle bundle =msg.getData();
-                    ArrayList list2 = new ArrayList();
-                    list2 = bundle.getParcelableArrayList("list");
-                    //rowsList = (List<List<String>>) list2.get(0);
+                case Error_Valicode:
+                    Toast.makeText(CourseActivity.this,"wrong code",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(CourseActivity.this,ClassActivity.class);
 
-
-                    Log.d("info","geiLIST"+rowsList.size());
+                    //sem = "20180";
+                    teacherName = "0000315";
 
 
 
-                    line1Column1.setText(rowsList.get(0).get(0));
-                    line1Column2.setText(rowsList.get(0).get(1));
-                    line1Column3.setText(rowsList.get(0).get(2));
-                    line1Column4.setText(rowsList.get(0).get(3));
-                    line1Column5.setText(rowsList.get(0).get(4));
-                    line1Column6.setText(rowsList.get(0).get(5));
-                    line1Column7.setText(rowsList.get(0).get(6));
+                    // intent.putExtra("classTable",rowsList);
 
-                    line2Column1.setText(rowsList.get(1).get(0));
-                    line2Column2.setText(rowsList.get(1).get(1));
-                    line2Column3.setText(rowsList.get(1).get(2));
-                    line2Column4.setText(rowsList.get(1).get(3));
-                    line2Column5.setText(rowsList.get(1).get(4));
-                    line2Column6.setText(rowsList.get(1).get(5));
-                    line2Column7.setText(rowsList.get(1).get(6));
-
-                    line3Column1.setText(rowsList.get(2).get(0));
-                    line3Column2.setText(rowsList.get(2).get(1));
-                    line3Column3.setText(rowsList.get(2).get(2));
-                    line3Column4.setText(rowsList.get(2).get(3));
-                    line3Column5.setText(rowsList.get(2).get(4));
-                    line3Column6.setText(rowsList.get(2).get(5));
-                    line3Column7.setText(rowsList.get(2).get(6));
-
-
-                    line4Column1.setText(rowsList.get(3).get(0));
-                    line4Column2.setText(rowsList.get(3).get(1));
-                    line4Column3.setText(rowsList.get(3).get(2));
-                    line4Column4.setText(rowsList.get(3).get(3));
-                    line4Column5.setText(rowsList.get(3).get(4));
-                    line4Column6.setText(rowsList.get(3).get(5));
-                    line4Column7.setText(rowsList.get(3).get(6));
-
-                    line5Column1.setText(rowsList.get(4).get(0));
-                    line5Column2.setText(rowsList.get(4).get(1));
-                    line5Column3.setText(rowsList.get(4).get(2));
-                    line5Column4.setText(rowsList.get(4).get(3));
-                    line5Column5.setText(rowsList.get(4).get(4));
-                    line5Column6.setText(rowsList.get(4).get(5));
-                    line5Column7.setText(rowsList.get(4).get(6));
-
-                    break;
-
+                    startActivity(intent);
+//                case GETLIST:
+//                    Bundle bundle =msg.getData();
+//                    ArrayList list2 = new ArrayList();
+//                    list2 = bundle.getParcelableArrayList("list");
+//                    //rowsList = (List<List<String>>) list2.get(0);
+//                    Log.d("info","geiLIST"+rowsList.size());
+//
+//                    break;
+//
             }
 
         }
@@ -96,127 +74,97 @@ public class CourseActivity extends Activity {
 
     private String security;
 
-    private TextView line1Column1;
-    private TextView line1Column2;
-    private TextView line1Column3;
-    private TextView line1Column4;
-    private TextView line1Column5;
-    private TextView line1Column6;
-    private TextView line1Column7;
-
-    private TextView line2Column1;
-    private TextView line2Column2;
-    private TextView line2Column3;
-    private TextView line2Column4;
-    private TextView line2Column5;
-    private TextView line2Column6;
-    private TextView line2Column7;
-
-    private TextView line3Column1;
-    private TextView line3Column2;
-    private TextView line3Column3;
-    private TextView line3Column4;
-    private TextView line3Column5;
-    private TextView line3Column6;
-    private TextView line3Column7;
-
-    private TextView line4Column1;
-    private TextView line4Column2;
-    private TextView line4Column3;
-    private TextView line4Column4;
-    private TextView line4Column5;
-    private TextView line4Column6;
-    private TextView line4Column7;
-
-    private TextView line5Column1;
-    private TextView line5Column2;
-    private TextView line5Column3;
-    private TextView line5Column4;
-    private TextView line5Column5;
-    private TextView line5Column6;
-    private TextView line5Column7;
-
-    private TextView line6Column1;
-    private TextView line6Column2;
-    private TextView line6Column3;
-    private TextView line6Column4;
-    private TextView line6Column5;
-    private TextView line6Column6;
-    private TextView line6Column7;
-
 
     private TextView[][] lineColumn =new TextView[5][5];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_course);
+        setContentView(R.layout.course);
+
 
         PermissionUtils.verifyStoragePermissions(this);
 
-        try {
-            getScheduleByTea();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         Intent intent = getIntent();
         security = intent.getStringExtra("yzm");
-        Log.d("info","Course get security"+security);
+        teacherName = intent.getStringExtra("teacher");
+        semesterTime = intent.getStringExtra("semester");
+        Log.d("info2","Course get security"+security+"-----teacher:"+teacherName+"-----semester:"+semesterTime);
 
+//        try {
+//            getScheduleByTea();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
-            line1Column1 = (TextView) findViewById(R.id.line1Column1);
-            line1Column2 = (TextView) findViewById(R.id.line1Column2);
-            line1Column3 = (TextView) findViewById(R.id.line1Column3);
-            line1Column4 = (TextView) findViewById(R.id.line1Column4);
-            line1Column5 = (TextView) findViewById(R.id.line1Column5);
-            line1Column6 = (TextView) findViewById(R.id.line1Column6);
-            line1Column7 = (TextView) findViewById(R.id.line1Column7);
+       // line1Column1 = (TextView) findViewById(R.id.line1Column1);
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,2);
+        SQLiteDatabase db =  myDataBaseHelper.getWritableDatabase();
 
+        Cursor cursor = db.query("ClassTable", null, null, null, null, null, null);
 
-            line2Column1 = (TextView) findViewById(R.id.line2Column1);
-            line2Column2 = (TextView) findViewById(R.id.line2Column2);
-            line2Column3 = (TextView) findViewById(R.id.line2Column3);
-            line2Column4 = (TextView) findViewById(R.id.line2Column4);
-            line2Column5 = (TextView) findViewById(R.id.line2Column5);
-            line2Column6 = (TextView) findViewById(R.id.line2Column6);
-            line2Column7 = (TextView) findViewById(R.id.line2Column7);
+        ArrayList<ClassTable> list = new ArrayList<ClassTable>();
+        List<String> forAdaptorList=new ArrayList<String>();
+        int j =0;
+        String namei="";
+        String semesteri = "";
 
-            line3Column1 = (TextView) findViewById(R.id.line3Column1);
-            line3Column2 = (TextView) findViewById(R.id.line3Column2);
-            line3Column3 = (TextView) findViewById(R.id.line3Column3);
-            line3Column4 = (TextView) findViewById(R.id.line3Column4);
-            line3Column5 = (TextView) findViewById(R.id.line3Column5);
-            line3Column6 = (TextView) findViewById(R.id.line3Column6);
-            line3Column7 = (TextView) findViewById(R.id.line3Column7);
+        //首先在本地SQLite服务器里查找数据
+        if (cursor.moveToFirst()) {
 
-            line4Column1 = (TextView) findViewById(R.id.line4Column1);
-            line4Column2 = (TextView) findViewById(R.id.line4Column2);
-            line4Column3 = (TextView) findViewById(R.id.line4Column3);
-            line4Column4 = (TextView) findViewById(R.id.line4Column4);
-            line4Column5 = (TextView) findViewById(R.id.line4Column5);
-            line4Column6 = (TextView) findViewById(R.id.line4Column6);
-            line4Column7 = (TextView) findViewById(R.id.line4Column7);
+            do {
+                namei = cursor.getString(cursor.getColumnIndex("teacherName"));
+                semesteri = cursor.getString(cursor.getColumnIndex("semester"));
 
-            line5Column1 = (TextView) findViewById(R.id.line5Column1);
-            line5Column2 = (TextView) findViewById(R.id.line5Column2);
-            line5Column3 = (TextView) findViewById(R.id.line5Column3);
-            line5Column4 = (TextView) findViewById(R.id.line5Column4);
-            line5Column5 = (TextView) findViewById(R.id.line5Column5);
-            line5Column6 = (TextView) findViewById(R.id.line5Column6);
-            line5Column7 = (TextView) findViewById(R.id.line5Column7);
+                if(teacherName.equals(namei)&&semesterTime.equals(semesteri)){
+                   Log.d("database","get data");
+                    int classLine = cursor.getInt(cursor.getColumnIndex("classLine"));
+                    int classColumn = cursor.getInt(cursor.getColumnIndex("classColumn"));
+                    String classTable = cursor.getString(cursor.getColumnIndex("inClass"));
+                    //String teacherName = cursor.getString(cursor.getColumnIndex("teacherName"));
+                    //String semester = cursor.getString(cursor.getColumnIndex("semester"));
 
-            line6Column1 = (TextView) findViewById(R.id.line6Column1);
-            line6Column2 = (TextView) findViewById(R.id.line6Column2);
-            line6Column3 = (TextView) findViewById(R.id.line6Column3);
-            line6Column4 = (TextView) findViewById(R.id.line6Column4);
-            line6Column5 = (TextView) findViewById(R.id.line6Column5);
-            line6Column6 = (TextView) findViewById(R.id.line6Column6);
-            line6Column7 = (TextView) findViewById(R.id.line6Column7);
+                    ClassTable classTable1 = new ClassTable(teacherName,semesterTime);
+                    classTable1.setColumn(classColumn);
+                    classTable1.setLine(classLine);
+                    classTable1.setInClass(classTable);
+                    list.add(classTable1);
 
+                }
 
+                //line1Column1.setText(classTable);
+                //Log.d("list","line+++"+list.get(j).getLine()+"Column--------"+list.get(j).getColumn()+"table-------"+list.get(j).getInClass());
+                j++;
 
+            } while (cursor.moveToNext());
 
+        }
+
+        //当SQLite里面没有需要的数据时，去云服务器查找需要的数据
+        if(list.size()==0){}
+
+        for(int i=0;i<42;i++){
+
+            forAdaptorList.add(new String(" "));
+        }
+        forAdaptorList.set(0,"anceasjfbhkahf");
+       int adCol=0,adRow=0;
+        String adString="";
+        for(int i=0;i<list.size();i++){
+            adRow=list.get(i).getLine();
+            adCol=list.get(i).getColumn();
+            adString=list.get(i).getInClass();
+            forAdaptorList.set(adRow*7+adCol,adString);
+            Log.d("aaa",""+forAdaptorList.get(0));
+
+        }
+        gv = (GridView) findViewById(R.id.courceDetail);
+
+Log.i("test",forAdaptorList.size()+"");
+        ga = new GridAdaptor(this,forAdaptorList);
+        gv.setAdapter(ga);
+
+       cursor.close();
 
 
     }
@@ -260,18 +208,73 @@ public class CourseActivity extends Activity {
                     }
                     inputStream.close();
                     outputStream2.close();
-                    //handler.sendEmptyMessage(1);
 
 
                     rowsList = data.parseHtml();
-                    Log.d("info","size"+rowsList.size());
-                    Message message = new Message();
-                    message.what = GETLIST;
-                    ArrayList list = new ArrayList();
-                    list.add(rowsList);
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelableArrayList("list",list);
-                    handler.sendMessage(message);
+                    //判断rowsList传来的信息是什么
+                    //1.空表  那就啥也不干  直接进界面
+                    //2.验证码错误  这个时候list的size==1
+
+                    if(rowsList.size()!=0)
+                    {
+                        if(rowsList.get(0).get(0).equals("error_code")){
+                            //todo   通知验证码错误
+                           handler.sendEmptyMessage(Error_Valicode);
+                        }
+
+                        //第三种情况  真的有表
+                        else{
+
+
+                            for (int i = 0; i < rowsList.size(); i++) {
+                                for (int j = 0; j < rowsList.get(i).size(); j++) {
+                                    if (rowsList.get(i).get(j).equals("")) System.out.print("无课");
+                                    else {
+
+                                        String classtable = rowsList.get(i).get(j);
+                                        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+                                        ContentValues values = new ContentValues();
+                                        values.put("classLine", i);
+                                        values.put("classColumn",j );
+                                        values.put("teacherName","0000315");
+                                        values.put("semester","20180");
+                                        values.put("inClass",classtable);
+                                        db.insert("ClassTable", null, values);
+
+                                        Log.d("course",""+rowsList.get(i).get(j));
+                                        System.out.print(rowsList.get(i).get(j));
+                                    }
+                                    System.out.print(" ");
+
+                                }
+                                System.out.println("");
+
+                            }
+                            Message message = new Message();
+                            message.what = GETLIST;
+                            ArrayList list = new ArrayList();
+                            list.add(rowsList);
+                            Bundle bundle = new Bundle();
+                            bundle.putParcelableArrayList("list",list);
+                            handler.sendMessage(message);
+                        }
+
+                    }
+                    else {
+                        Message message = new Message();
+                        message.what = GETLIST;
+                        ArrayList list = new ArrayList();
+                        list.add(rowsList);
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelableArrayList("list",list);
+                        handler.sendMessage(message);
+
+                    }
+                    //rowlist存入数据库
+
+
+//                    Log.d("info","size"+rowsList.size());
+
 
 
                 }
@@ -281,6 +284,8 @@ public class CourseActivity extends Activity {
 
             }
         }.start();}
+
+
 
 
 

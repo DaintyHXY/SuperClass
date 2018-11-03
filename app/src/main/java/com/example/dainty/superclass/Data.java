@@ -23,6 +23,8 @@ import java.util.List;
 
 public class Data implements DataProcess {
 
+    private MyDataBaseHelper myDataBaseHelper;
+
 
     @Override
     public Bitmap getCookieAndValidateCode(String teacherName, String semester) {
@@ -59,13 +61,35 @@ public class Data implements DataProcess {
         }
         System.out.println(">>>>>");
         System.out.println(string);
+        //文件载入完毕
+        //先判断验证码错误的情况
+
         Document document = Jsoup.parse(string);
+        List<List<String>> rowsList = new ArrayList<List<String>>();
+        //验证码错误情况
+        Elements script=document.getElementsByTag("script");
+        if(script.size()>0){
+            int error_yzm=script.get(0).data().indexOf("验证码错误");
+            if(error_yzm!=-1){}
+            //todo  验证码错误提示   向外部传信息
+            List<String>yzmList=new ArrayList<String>();
+            yzmList.add("error_code");
+            rowsList.add(yzmList);//装个提示信息  yzm错误  List.get(0).get(0).equals("error_code");
+            return  rowsList;
+        }
+        //验证码正确  但是这个老师没课
+
+
         Elements table = document.getElementsByTag("table");
+        if(table.size()==1){
+
+            return  rowsList;
+        }
         System.out.println(table.size());
         Element rows = table.get(3);
         int start = 2, end = 8;
         //rows是我真正需要的那个table   共6行9列
-        List<List<String>> rowsList = new ArrayList<List<String>>();
+
         Elements trs = rows.getElementsByTag("tr");
         //开始   5行9列添数据
         for (int i = 1; i < 6; i++) {
@@ -101,6 +125,9 @@ public class Data implements DataProcess {
             System.out.println("");
 
         }
+
+        //存入数据库
+
 
         return rowsList;
     }
