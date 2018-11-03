@@ -38,13 +38,14 @@ public class ClassActivity extends Activity {
 
     public static final int UPDATE_PIC = 99;
 
-    private DataProcess dataProcess;
+    private Data data = new Data();
 
     private Button search;
     private Spinner semester;
     private Spinner teacher;
     private String sem;
     private String teacherName;
+    private String security;
 
 
 
@@ -146,18 +147,20 @@ public class ClassActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                try {
-                    getScheduleByTea(v);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    getScheduleByTea(v);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
 
-
+                 security = securityCode.getText().toString();
                 //跳转到下一页面，并将学期和教师数据传输给下一个页面
                 Intent intent = new Intent(ClassActivity.this,CourseActivity.class);
 
                 intent.putExtra("semester",sem);
                 intent.putExtra("teacher",teacherName);
+                intent.putExtra("yzm",security);
+
                // intent.putExtra("classTable",rowsList);
 
                 startActivity(intent);
@@ -256,56 +259,56 @@ public class ClassActivity extends Activity {
 
 
 
-    public  void getScheduleByTea(View view)throws Exception{
-        new Thread(){
-            public void run(){
-                try{
-                    String yzm=securityCode.getText().toString();
-                    Log.i("bear",yzm+"->yzm");
-
-                    String cookie="";
-                    SharedPreferences sharedPreferences=getSharedPreferences("mycookie",Context.MODE_PRIVATE);
-                    cookie=sharedPreferences.getString("cookie","wrong!");
-                    Log.i("bear",cookie+"cookie"+"real using cookie");
-                    System.out.println(cookie);
-                    String referer="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB.aspx";
-                    String address="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB_rpt.aspx";
-                    URL url=new URL(address);
-                    HttpURLConnection connection=(HttpURLConnection)url.openConnection();
-                    connection.setDoInput(true);
-                    connection.setDoOutput(true);
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Cookie", cookie);
-                    connection.setRequestProperty("Referer", referer);
-                    StringBuilder builder=new StringBuilder();
-                    builder.append("Sel_XNXQ=20180&Sel_JS=0000315&type=1&txt_yzm="+yzm);
-                    OutputStream outputStream=connection.getOutputStream();
-                    outputStream.write(builder.toString().getBytes());
-                    int len=connection.getContentLength();
-                    System.out.println(len);
-                    byte[]buf=new byte[512];
-                    File file=new File("/sdcard/aa1.txt");
-
-                    InputStream inputStream=connection.getInputStream();
-                    OutputStream outputStream2=new FileOutputStream(file);
-                    while((len=inputStream.read(buf))!=-1)
-                    {
-                        outputStream2.write(buf, 0, len);
-
-                    }
-                    inputStream.close();
-                    outputStream2.close();
-                    handler.sendEmptyMessage(1);
-
-                    //parseHtml
-                    rowsList  =  dataProcess.parseHtml();
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-
-            }
-        }.start();}
+//    public  void getScheduleByTea(View view)throws Exception{
+//        new Thread(){
+//            public void run(){
+//                try{
+//                    String yzm=securityCode.getText().toString();
+//                    Log.i("bear",yzm+"->yzm");
+//
+//                    String cookie="";
+//                    SharedPreferences sharedPreferences=getSharedPreferences("mycookie",Context.MODE_PRIVATE);
+//                    cookie=sharedPreferences.getString("cookie","wrong!");
+//                    Log.i("bear",cookie+"cookie"+"real using cookie");
+//                    System.out.println(cookie);
+//                    String referer="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB.aspx";
+//                    String address="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB_rpt.aspx";
+//                    URL url=new URL(address);
+//                    HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+//                    connection.setDoInput(true);
+//                    connection.setDoOutput(true);
+//                    connection.setRequestMethod("POST");
+//                    connection.setRequestProperty("Cookie", cookie);
+//                    connection.setRequestProperty("Referer", referer);
+//                    StringBuilder builder=new StringBuilder();
+//                    builder.append("Sel_XNXQ=20180&Sel_JS=0000315&type=1&txt_yzm="+yzm);
+//                    OutputStream outputStream=connection.getOutputStream();
+//                    outputStream.write(builder.toString().getBytes());
+//                    int len=connection.getContentLength();
+//                    System.out.println(len);
+//                    byte[]buf=new byte[512];
+//                    File file=new File("/sdcard/aa1.txt");
+//
+//                    InputStream inputStream=connection.getInputStream();
+//                    OutputStream outputStream2=new FileOutputStream(file);
+//                    while((len=inputStream.read(buf))!=-1)
+//                    {
+//                        outputStream2.write(buf, 0, len);
+//
+//                    }
+//                    inputStream.close();
+//                    outputStream2.close();
+//                    handler.sendEmptyMessage(1);
+//
+//
+//                   rowsList = data.parseHtml();
+//                }
+//                catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        }.start();}
 }
 
 

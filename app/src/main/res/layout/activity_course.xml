@@ -146,30 +146,35 @@
                     android:text="1" />
 
                 <TextView
+                    android:id="@+id/line2Column1"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="2" />
 
                 <TextView
+                    android:id="@+id/line3Column1"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="3" />
 
                 <TextView
+                    android:id="@+id/line4Column1"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="4" />
 
                 <TextView
+                    android:id="@+id/line5Column1"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="5" />
 
                 <TextView
+                    android:id="@+id/line6Column1"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
@@ -184,36 +189,42 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/line1Column2"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="7" />
 
                 <TextView
+                    android:id="@+id/line2Column2"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="8" />
 
                 <TextView
+                    android:id="@+id/line3Column2"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="9" />
 
                 <TextView
+                    android:id="@+id/line4Column2"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="10" />
 
                 <TextView
+                    android:id="@+id/line5Column2"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="11" />
 
                 <TextView
+                    android:id="@+id/line6Column2"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
@@ -228,36 +239,42 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/line1Column3"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="13" />
 
                 <TextView
+                    android:id="@+id/line2Column3"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="14" />
 
                 <TextView
+                    android:id="@+id/line3Column3"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="15" />
 
                 <TextView
+                    android:id="@+id/line4Column3"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="16" />
 
                 <TextView
+                    android:id="@+id/line5Column3"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="17" />
 
                 <TextView
+                    android:id="@+id/line6Column3"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
@@ -272,36 +289,42 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/line1Column4"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="19" />
 
                 <TextView
+                    android:id="@+id/line2Column4"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="20" />
 
                 <TextView
+                    android:id="@+id/line3Column4"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="21" />
 
                 <TextView
+                    android:id="@+id/line4Column4"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="22" />
 
                 <TextView
+                    android:id="@+id/line5Column4"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="23" />
 
                 <TextView
+                    android:id="@+id/line6Column4"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
@@ -316,36 +339,42 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/line1Column5"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="25" />
 
                 <TextView
+                    android:id="@+id/line2Column5"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="26" />
 
                 <TextView
+                    android:id="@+id/line3Column5"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="27" />
 
                 <TextView
+                    android:id="@+id/line4Column5"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="28" />
 
                 <TextView
+                    android:id="@+id/line5Column5"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="29" />
 
                 <TextView
+                    android:id="@+id/line6Column5"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
@@ -360,36 +389,42 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/line1Column6"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="31" />
 
                 <TextView
+                    android:id="@+id/line2Column6"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="32" />
 
                 <TextView
+                    android:id="@+id/line3Column6"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="33" />
 
                 <TextView
+                    android:id="@+id/line4Column6"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="34" />
 
                 <TextView
+                    android:id="@+id/line5Column6"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="35" />
 
                 <TextView
+                    android:id="@+id/line6Column6"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
@@ -404,36 +439,42 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/line1Column7"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="37" />
 
                 <TextView
+                    android:id="@+id/line2Column7"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="38" />
 
                 <TextView
+                    android:id="@+id/line3Column7"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="39" />
 
                 <TextView
+                    android:id="@+id/line4Column7"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="40" />
 
                 <TextView
+                    android:id="@+id/line5Column7"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
                     android:text="41" />
 
                 <TextView
+                    android:id="@+id/line6Column7"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
                     android:gravity="center"
