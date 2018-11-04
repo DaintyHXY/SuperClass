@@ -93,8 +93,8 @@ public class MyDataBaseHelper extends SQLiteOpenHelper {
     }
 
     public static List<Teacher> getTeacherList(SQLiteDatabase db,String name){
-        String tname = "%"+name+"%";
-       Cursor cursor = db.rawQuery("select * from Teacher where techerRealName Like "+tname,null);
+        String tname = name+"%";
+       Cursor cursor = db.rawQuery("select * from Teacher where teacherRealName Like '"+tname+"'",null);
        List<Teacher> teachers = new ArrayList<Teacher>();
 
         if(cursor.moveToFirst()){

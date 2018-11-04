@@ -44,6 +44,9 @@ public class ClassActivity extends Activity {
     public static final int AUTO_CODE=2;
     private static final int Error_Valicode = 69;
 
+
+    private EditText matchTeacher;
+
     private Data data = new Data();
     private Handler doInsertHandler;
 
@@ -178,6 +181,8 @@ public class ClassActivity extends Activity {
         semester = (Spinner)findViewById(R.id.semester);
         teacher = (Spinner)findViewById(R.id.teacher);
 
+
+
         Log.i("teacher","OKK");
        //teacherList= TeacherProcess.parseTeacherList();
 
@@ -207,7 +212,37 @@ public class ClassActivity extends Activity {
         teacher.setAdapter(teacherAdapter);
         teacherAdapter.notifyDataSetChanged();
         Log.d("teacherlist",""+teacherList.get(3).getTeacherName());
-
+//
+//        matchTeacher = (EditText) findViewById(R.id.matchTeacher);
+//        matchTeacher.setOnFocusChangeListener(new View.OnFocusChangeListener(){
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                String s =matchTeacher.getText().toString();
+//                SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+//                teacherList = new ArrayList<Teacher>();
+//                //获得teacherlist
+//                Cursor cursor = db.query("Teacher",null,null,null,null,null,null);
+//                if (cursor.moveToFirst()) {
+//
+//                    do {
+//
+//                        Log.d("database","get teacherList");
+//                        String fTeacherName = cursor.getString(cursor.getColumnIndex("teacherName"));
+//                        String fTeacherRealName = cursor.getString(cursor.getColumnIndex("teacherRealName"));
+//                        int isInDatabase = cursor.getInt(cursor.getColumnIndex("isInDatabase"));
+//
+//                        Teacher teacher1 = new Teacher(fTeacherName,fTeacherRealName);
+//                        teacher1.setIsInDatabase(isInDatabase);
+//                        teacherList.add(teacher1);
+//                        if(isInDatabase==1)
+//                            Log.d("11111",""+teacher1.getTeacherRealName());
+//
+//                    } while (cursor.moveToNext());
+//                }
+//                teacherList = MyDataBaseHelper.getTeacherList(db,s);
+//                teacherAdapter.notifyDataSetChanged();
+//            }
+//        });
         identifyCode = (ImageView)findViewById(R.id.img_securitycode);
         identifyCode.setOnClickListener(new View.OnClickListener() {
             @Override
