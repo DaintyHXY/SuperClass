@@ -71,8 +71,8 @@ public class MyDataBaseHelper extends SQLiteOpenHelper {
                 db.delete("Teacher",null,null);
                 Log.d("delete","success");
 
-            case 9:
-
+            case 11:
+                db.execSQL(CREATE_TEACHER);
                 Log.d("create success","1");
                 List<Teacher> teachers = teacherProcess.parseTeacherList();
                 for (Teacher t :teachers){

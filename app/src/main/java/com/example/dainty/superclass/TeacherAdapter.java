@@ -2,6 +2,7 @@ package com.example.dainty.superclass;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.ColorSpace;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -50,13 +51,16 @@ public class TeacherAdapter extends ArrayAdapter {
 //        teacherName.setText(t.getTeacherName());
         teacherRealName.setText(t.getTeacherRealName());
         if (convertView != null) {
-            if (t.getIsInDatabase()==0)
-                convertView.setBackgroundColor(Color.rgb(200, 200, 200));
+                if (t.getIsInDatabase()==1){
+                    teacherRealName.setBackgroundColor(Color.RED);
+                    Log.d("come","111111");
+                }
+
             else
-                convertView.setBackgroundColor(Color.TRANSPARENT);
+                view.setBackgroundColor(Color.TRANSPARENT);
         }
         return view;
-    }
+   }
 
     @Override
     public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -73,8 +77,10 @@ public class TeacherAdapter extends ArrayAdapter {
 //        teacherName.setText(t.getTeacherName());
         teacherRealName.setText(t.getTeacherRealName());
         if (convertView != null) {
-            if (t.getIsInDatabase()==0)
-                convertView.setBackgroundColor(Color.rgb(200, 200, 200));
+            if (t.getIsInDatabase()==1){
+                teacherRealName.setBackgroundColor(Color.RED);
+            Log.i("cnm","come");
+            }
             else
                 convertView.setBackgroundColor(Color.TRANSPARENT);
         }

@@ -45,6 +45,7 @@ public class ClassActivity extends Activity {
     private static final int Error_Valicode = 69;
 
     private Data data = new Data();
+    private Handler doInsertHandler;
 
     private Button search;
     private Spinner semester;
@@ -52,6 +53,7 @@ public class ClassActivity extends Activity {
     private String sem;
     private String teacherName="";
     private String security;
+    private List<ClassTable> doInsertList=new ArrayList<ClassTable>();
 
 
 
@@ -75,7 +77,7 @@ public class ClassActivity extends Activity {
     private TextView sName;
     private TextView sPassword;
 
-    List<Teacher> teacherList;
+    List<Teacher> teacherList = new ArrayList<Teacher>();
 
     private Handler handler2 = new Handler(){
 
@@ -169,15 +171,41 @@ public class ClassActivity extends Activity {
 
 
 
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,12);
+
         search = (Button)findViewById(R.id.toSearch);
 
         semester = (Spinner)findViewById(R.id.semester);
         teacher = (Spinner)findViewById(R.id.teacher);
 
         Log.i("teacher","OKK");
-        teacherList= TeacherProcess.parseTeacherList();
-        TeacherAdapter teacherAdapter = new TeacherAdapter(this,android.R.layout.simple_list_item_1,teacherList);
+       //teacherList= TeacherProcess.parseTeacherList();
+
+        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+
+        //获得teacherlist
+        Cursor cursor = db.query("Teacher",null,null,null,null,null,null);
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                    Log.d("database","get teacherList");
+                    String fTeacherName = cursor.getString(cursor.getColumnIndex("teacherName"));
+                    String fTeacherRealName = cursor.getString(cursor.getColumnIndex("teacherRealName"));
+                    int isInDatabase = cursor.getInt(cursor.getColumnIndex("isInDatabase"));
+
+                    Teacher teacher1 = new Teacher(fTeacherName,fTeacherRealName);
+                    teacher1.setIsInDatabase(isInDatabase);
+                    teacherList.add(teacher1);
+                    if(isInDatabase==1)
+                        Log.d("11111",""+teacher1.getTeacherRealName());
+
+            } while (cursor.moveToNext());
+        }
+
+        final TeacherAdapter teacherAdapter = new TeacherAdapter(this,android.R.layout.simple_list_item_1,teacherList);
         teacher.setAdapter(teacherAdapter);
+        teacherAdapter.notifyDataSetChanged();
         Log.d("teacherlist",""+teacherList.get(3).getTeacherName());
 
         identifyCode = (ImageView)findViewById(R.id.img_securitycode);
@@ -193,7 +221,7 @@ public class ClassActivity extends Activity {
         securityCode = (EditText)findViewById(R.id.securitycode);
 
         //创建数据库
-        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,10);
+
         //myDataBaseHelper.getWritableDatabase();
 
 
@@ -204,10 +232,13 @@ public class ClassActivity extends Activity {
                 sem = (String) semester.getSelectedItem();
                 sem = semesterProcess(sem);
                 Log.d("info","semester:"+sem);
+
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+
+                teacherAdapter.notifyDataSetChanged();
 
             }
         });
@@ -236,6 +267,7 @@ public class ClassActivity extends Activity {
                                           try {
 
                                               //查询本机数据库，得到list如果  list不为空 进course
+                                              Log.d("shunxu","local database search");
                                               List queryFromLocal_List=getFromLocal();
                                              if(queryFromLocal_List.size()>0){
 
@@ -253,17 +285,32 @@ public class ClassActivity extends Activity {
                                                  startActivity(intent);
                                               }
                                               else {
-                                                 queryFromLocal_List=getListFromRemote();
+                                                 Log.d("shunxu","remote database search");
+                                                getListFromRemote();
                                                  //如果远端有数据  存入本地库
-                                                 if(queryFromLocal_List.size()>0){
-                                                     //把远端的数据插入数据库
+                                               doInsertHandler=new Handler(){
+                                                   @Override
+                                                   public void handleMessage(Message msg) {
+                                                      if(msg.what==1){
+                                                          if(doInsertList.size()>0){
+                                                              //把远端的数据插入数据库
 
-                                                     doInsert(queryFromLocal_List);
-                                                 }
-                                                 else {
-                                                     getScheduleByTea();
-                                                 }
+                                                              doInsert(doInsertList);
+                                                              handler3.sendEmptyMessage(3);
+                                                          }
+                                                          else {
+                                                              Log.i("bear","weibi qu cha le ?");
+                                                              try {
+                                                                  Log.d("shunxu","in to p");
+                                                                  getScheduleByTea();
+                                                              } catch (Exception e) {
+                                                                  e.printStackTrace();
+                                                              }
+                                                          }
 
+                                                      }
+                                                   }
+                                               };
 
                                              }
 
@@ -400,7 +447,32 @@ public class ClassActivity extends Activity {
     //从远端访问数据库
 public  List getListFromRemote(){
 //todo  从远端得到数据
-        return  new ArrayList();
+
+
+
+    new Thread(){
+
+        @Override
+        public void run() {
+            List<ClassTable>geter=MysqImpl.selectClassTableByTeacherName(teacherName,sem);
+            Log.d("remote","teacherName----"+teacherName+"----seme"+sem);
+//            Log.i("bear",geter.get(0).getSemster()+"   ->semes");
+            Log.i("bear","list:---r---"+geter.size());
+//             Intent intent = new Intent(ClassActivity.this,MainActivity.class);
+//
+//
+//
+//
+//
+//            startActivity(intent);
+            doInsertList=geter;
+            doInsertHandler.sendEmptyMessage(1);
+            Log.i("bear","i come here");
+
+        }
+    }.start();
+
+    return  new ArrayList();
 }
     public  void getScheduleByTea()throws Exception{
         new Thread(){
@@ -431,7 +503,7 @@ public  List getListFromRemote(){
                     System.out.println(len);
                     byte[]buf=new byte[512];
                     File file=new File("/sdcard/aa1.txt");
-
+                    List<ClassTable> forReometeList=new ArrayList<ClassTable>();
                     InputStream inputStream=connection.getInputStream();
                     OutputStream outputStream2=new FileOutputStream(file);
                     while((len=inputStream.read(buf))!=-1)
@@ -457,15 +529,23 @@ public  List getListFromRemote(){
 
                         //第三种情况  真的有表
                         else{
+                            SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+                            //修改易查询老师的表
+                            //先往近端写
+
+                            //Cursor cursor = db.rawQuery("SELECT * from Teacher where teacherName=?",new String[]{teacherName});
+//                            ContentValues contentValues = new ContentValues();
+//                            contentValues.put("inInDatabase","1");
+//                            db.update("Teacher",contentValues,"teacherName=?",new String[]{teacherName});
 
                             Log.d("databasein","start into database");
                             for (int i = 0; i < rowsList.size(); i++) {
                                 for (int j = 0; j < rowsList.get(i).size(); j++) {
                                     if (rowsList.get(i).get(j).equals("")) System.out.print("无课");
                                     else {
-
+//填入近端所需数据
                                         String classtable = rowsList.get(i).get(j);
-                                        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+
                                         ContentValues values = new ContentValues();
                                         values.put("classLine", i);
                                         values.put("classColumn",j );
@@ -473,6 +553,12 @@ public  List getListFromRemote(){
                                         values.put("semester",sem);
                                         values.put("inClass",classtable);
                                         db.insert("ClassTable", null, values);
+//填入远端所需数据
+                                        ClassTable c=new ClassTable(teacherName,sem);
+                                        c.setLine(i);
+                                        c.setColumn(j);
+                                        c.setInClass(classtable);
+                                        forReometeList.add(c);
 
                                         Log.d("course",""+rowsList.get(i).get(j));
                                         System.out.print(rowsList.get(i).get(j));
@@ -482,6 +568,11 @@ public  List getListFromRemote(){
                                 }
                                 System.out.println("");
 
+                            }
+
+                            //往远端写
+                            for(ClassTable c : forReometeList){
+                                MysqImpl.addClassTable(c);
                             }
                            //进下一个
                             handler3.sendEmptyMessage(3);

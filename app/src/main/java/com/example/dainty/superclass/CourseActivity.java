@@ -98,7 +98,7 @@ public class CourseActivity extends Activity {
 //        }
 
        // line1Column1 = (TextView) findViewById(R.id.line1Column1);
-        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,10);
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,12);
         SQLiteDatabase db =  myDataBaseHelper.getWritableDatabase();
 
         Cursor cursor = db.query("ClassTable", null, null, null, null, null, null);
@@ -108,6 +108,10 @@ public class CourseActivity extends Activity {
         int j =0;
         String namei="";
         String semesteri = "";
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("isInDatabase","1");
+        db.update("Teacher",contentValues,"teacherName=?",new String[]{teacherName});
 
         //首先在本地SQLite服务器里查找数据
         if (cursor.moveToFirst()) {

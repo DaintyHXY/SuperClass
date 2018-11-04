@@ -14,10 +14,10 @@ import java.util.Properties;
  *
  */
 public class JdbcUtil {
-	private static String url = null;
-	private static String user = null;
-	private static String password = null;
-	private static String driverClass = null;
+	private static String url = "jdbc:mysql://106.15.229.228:3306/school?useSSL=true";
+	private static String user = "root";
+	private static String password = "root";
+	private static String driverClass = "com.mysql.jdbc.Driver";
 	
 	/**
 	 * 静态代码块中（只加载一次）
@@ -25,7 +25,7 @@ public class JdbcUtil {
 	static{
 		try {
 			//读取db.properties文件
-			Properties props = new Properties();
+//			Properties props = new Properties();
 			/**
 			 *  . 代表java命令运行的目录
 			 *  在java项目下，. java命令的运行目录从项目的根目录开始
@@ -39,17 +39,17 @@ public class JdbcUtil {
 			 *  / : 斜杠表示classpath的根目录
 			 *     在java项目下，classpath的根目录从bin目录开始
 			 *     在web项目下，classpath的根目录从WEB-INF/classes目录开始
-			 */
-			InputStream in = JdbcUtil.class.getResourceAsStream("/db.properties");
-			
-			//加载文件
-			props.load(in);
-			//读取信息
-			url = props.getProperty("url");
-			user = props.getProperty("user");
-			password = props.getProperty("password");
-			driverClass = props.getProperty("driverClass");
-			
+//			 */
+//			InputStream in = JdbcUtil.class.getResourceAsStream("/db.properties");
+//
+//			//加载文件
+//			props.load(in);
+//			//读取信息
+//			url = props.getProperty("url");
+//			user = props.getProperty("user");
+//			password = props.getProperty("password");
+//			driverClass = props.getProperty("driverClass");
+//
 			
 			//注册驱动程序
 			Class.forName(driverClass);

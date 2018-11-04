@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         PermissionUtils.verifyStoragePermissions(this);
 
-        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,10);
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,12);
         myDataBaseHelper.getWritableDatabase();
 
 

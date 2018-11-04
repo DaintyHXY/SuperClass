@@ -9,12 +9,11 @@
         android:layout_width="100dp"
         android:layout_height="20dp"
         android:gravity="center"
-        android:text="40" />
+      />
 
     <TextView
         android:id="@+id/teacherRealName"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:gravity="center"
-        android:text="41" />
+        android:gravity="center" />
 </LinearLayout>
