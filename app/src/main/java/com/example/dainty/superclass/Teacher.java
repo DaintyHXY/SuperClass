@@ -2,39 +2,36 @@ package com.example.dainty.superclass;
 
 public class Teacher {
 
-    private int teacherId;
-    private String tName;
-    private String tSex;
+    private String teacherName;
+    private String teacherRealName;
+    private int isInDatabase=0;
 
-    public Teacher() {
-        super();
-    }
-    public Teacher(String name ,String sex){
-        this.tName = name ;
-        this.tSex = sex;
+    public Teacher(String teacherName, String teacherRealName) {
+        this.teacherName = teacherName;
+        this.teacherRealName = teacherRealName;
     }
 
-    public int gettId() {
-        return teacherId;
+    public String getTeacherName() {
+        return teacherName;
     }
 
-    public void settId(int tId) {
-        this.teacherId = tId;
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 
-    public String gettName() {
-        return tName;
+    public String getTeacherRealName() {
+        return teacherRealName;
     }
 
-    public void settName(String tName) {
-        this.tName = tName;
+    public void setTeacherRealName(String teacherRealName) {
+        this.teacherRealName = teacherRealName;
     }
 
-    public String gettSex() {
-        return tSex;
+    public int getIsInDatabase() {
+        return isInDatabase;
     }
 
-    public void settSex(String tSex) {
-        this.tSex = tSex;
+    public void setIsInDatabase(int isInDatabase) {
+        this.isInDatabase = isInDatabase;
     }
 }

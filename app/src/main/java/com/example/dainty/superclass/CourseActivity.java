@@ -98,7 +98,7 @@ public class CourseActivity extends Activity {
 //        }
 
        // line1Column1 = (TextView) findViewById(R.id.line1Column1);
-        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,2);
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,10);
         SQLiteDatabase db =  myDataBaseHelper.getWritableDatabase();
 
         Cursor cursor = db.query("ClassTable", null, null, null, null, null, null);
@@ -137,6 +137,7 @@ public class CourseActivity extends Activity {
                 j++;
 
             } while (cursor.moveToNext());
+            Log.d("course list","list size:++++++"+list.size());
 
         }
 
@@ -147,7 +148,7 @@ public class CourseActivity extends Activity {
 
             forAdaptorList.add(new String(" "));
         }
-        forAdaptorList.set(0,"anceasjfbhkahf");
+        //forAdaptorList.set(0,"anceasjfbhkahf");
        int adCol=0,adRow=0;
         String adString="";
         for(int i=0;i<list.size();i++){
@@ -191,7 +192,7 @@ Log.i("test",forAdaptorList.size()+"");
                     connection.setRequestProperty("Cookie", cookie);
                     connection.setRequestProperty("Referer", referer);
                     StringBuilder builder=new StringBuilder();
-                    builder.append("Sel_XNXQ=20180&Sel_JS=0000315&type=1&txt_yzm="+yzm);
+                    builder.append("Sel_XNXQ="+semesterTime+"&Sel_JS="+teacherName+"&type=1&txt_yzm="+yzm);
                     OutputStream outputStream=connection.getOutputStream();
                     outputStream.write(builder.toString().getBytes());
                     int len=connection.getContentLength();

@@ -27,4 +27,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation files('libs/jsoup-1.8.3.jar')
     implementation files('libs/json.jar')
+    implementation files('libs/mysql-connector-java-5.1.47-bin.jar')
 }

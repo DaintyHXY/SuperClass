@@ -50,7 +50,7 @@ public class ClassActivity extends Activity {
     private Spinner semester;
     private Spinner teacher;
     private String sem;
-    private String teacherName="WP00224";
+    private String teacherName="";
     private String security;
 
 
@@ -75,6 +75,7 @@ public class ClassActivity extends Activity {
     private TextView sName;
     private TextView sPassword;
 
+    List<Teacher> teacherList;
 
     private Handler handler2 = new Handler(){
 
@@ -166,10 +167,18 @@ public class ClassActivity extends Activity {
 
         PermissionUtils.verifyStoragePermissions(this);
 
+
+
         search = (Button)findViewById(R.id.toSearch);
 
         semester = (Spinner)findViewById(R.id.semester);
         teacher = (Spinner)findViewById(R.id.teacher);
+
+        Log.i("teacher","OKK");
+        teacherList= TeacherProcess.parseTeacherList();
+        TeacherAdapter teacherAdapter = new TeacherAdapter(this,android.R.layout.simple_list_item_1,teacherList);
+        teacher.setAdapter(teacherAdapter);
+        Log.d("teacherlist",""+teacherList.get(3).getTeacherName());
 
         identifyCode = (ImageView)findViewById(R.id.img_securitycode);
         identifyCode.setOnClickListener(new View.OnClickListener() {
@@ -184,7 +193,7 @@ public class ClassActivity extends Activity {
         securityCode = (EditText)findViewById(R.id.securitycode);
 
         //创建数据库
-        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,2);
+        myDataBaseHelper = new MyDataBaseHelper(this,"SuperClass.db",null,10);
         //myDataBaseHelper.getWritableDatabase();
 
 
@@ -206,7 +215,7 @@ public class ClassActivity extends Activity {
         teacher.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                teacherName = (String) teacher.getSelectedItem();
+                teacherName = teacherList.get(position).getTeacherName();
 //                teacherName="";
                 Log.d("info","teacher:"+teacherName);
 
@@ -225,7 +234,39 @@ public class ClassActivity extends Activity {
 
                  security = securityCode.getText().toString();
                                           try {
-                                              getScheduleByTea();
+
+                                              //查询本机数据库，得到list如果  list不为空 进course
+                                              List queryFromLocal_List=getFromLocal();
+                                             if(queryFromLocal_List.size()>0){
+
+                                                 Intent intent = new Intent(ClassActivity.this,CourseActivity.class);
+
+                                                 //sem = "20180";
+//               teacherName = "0000315";
+
+                                                 intent.putExtra("semester",sem);
+                                                 intent.putExtra("teacher",teacherName);
+                                                 intent.putExtra("yzm",security);
+
+                                                 //intent.putExtra("classTable",rowsList);
+
+                                                 startActivity(intent);
+                                              }
+                                              else {
+                                                 queryFromLocal_List=getListFromRemote();
+                                                 //如果远端有数据  存入本地库
+                                                 if(queryFromLocal_List.size()>0){
+                                                     //把远端的数据插入数据库
+
+                                                     doInsert(queryFromLocal_List);
+                                                 }
+                                                 else {
+                                                     getScheduleByTea();
+                                                 }
+
+
+                                             }
+
                                           } catch (Exception e) {
                                               e.printStackTrace();
                                           }
@@ -307,6 +348,60 @@ public class ClassActivity extends Activity {
 
     }
 
+    //近端访问数据库
+    public List<ClassTable> getFromLocal(){
+  //todo   近端数据库查询
+        List<ClassTable> reList = new ArrayList<ClassTable>();
+        String namei="";
+        String semesteri="";
+        int j = 0;
+        ArrayList<ClassTable> list = new ArrayList<ClassTable>();
+        //首先在本地SQLite服务器里查找数据
+        SQLiteDatabase db =  myDataBaseHelper.getWritableDatabase();
+        Cursor cursor = db.query("ClassTable", null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
+
+            do {
+                namei = cursor.getString(cursor.getColumnIndex("teacherName"));
+                semesteri = cursor.getString(cursor.getColumnIndex("semester"));
+
+                if(teacherName.equals(namei)&&sem.equals(semesteri)){
+                    Log.d("local search","get data");
+                    int classLine = cursor.getInt(cursor.getColumnIndex("classLine"));
+                    int classColumn = cursor.getInt(cursor.getColumnIndex("classColumn"));
+                    String classTable = cursor.getString(cursor.getColumnIndex("inClass"));
+                    //String teacherName = cursor.getString(cursor.getColumnIndex("teacherName"));
+                    //String semester = cursor.getString(cursor.getColumnIndex("semester"));
+
+                    ClassTable classTable1 = new ClassTable(teacherName,sem);
+                    classTable1.setColumn(classColumn);
+                    classTable1.setLine(classLine);
+                    classTable1.setInClass(classTable);
+                    list.add(classTable1);
+
+                }
+
+                //line1Column1.setText(classTable);
+                //Log.d("list","line+++"+list.get(j).getLine()+"Column--------"+list.get(j).getColumn()+"table-------"+list.get(j).getInClass());
+                j++;
+
+            } while (cursor.moveToNext());
+
+        }
+        reList = list;
+        Log.d("local search finish","lisr size:--------"+list.size());
+
+        return  reList;
+
+
+    }
+
+
+    //从远端访问数据库
+public  List getListFromRemote(){
+//todo  从远端得到数据
+        return  new ArrayList();
+}
     public  void getScheduleByTea()throws Exception{
         new Thread(){
             public void run(){
@@ -329,7 +424,7 @@ public class ClassActivity extends Activity {
                     connection.setRequestProperty("Cookie", cookie);
                     connection.setRequestProperty("Referer", referer);
                     StringBuilder builder=new StringBuilder();
-                    builder.append("Sel_XNXQ=20180&Sel_JS="+teacherName+"&type=1&txt_yzm="+yzm);
+                    builder.append("Sel_XNXQ="+sem+"&Sel_JS="+teacherName+"&type=1&txt_yzm="+yzm);
                     OutputStream outputStream=connection.getOutputStream();
                     outputStream.write(builder.toString().getBytes());
                     int len=connection.getContentLength();
@@ -416,6 +511,26 @@ public class ClassActivity extends Activity {
             }
         }.start();}
 
+        //数据库操作  把list存入数据库
+public void doInsert(List<ClassTable> fromRemoteList){
+
+        //todo
+        SQLiteDatabase db = myDataBaseHelper.getWritableDatabase();
+
+        for (ClassTable c :fromRemoteList){
+
+        ContentValues values = new ContentValues();
+        values.put("classLine", c.getLine());
+        values.put("classColumn",c.getColumn() );
+        values.put("teacherName",c.getTeacherName());
+        values.put("semester",c.getSemster());
+        values.put("inClass",c.getInClass());
+        db.insert("ClassTable", null, values);
+    }
+    Log.d("remote insert","remote class table insert finish");
+
+
+}
     public String semesterProcess(String semester){
 
         String year="";
