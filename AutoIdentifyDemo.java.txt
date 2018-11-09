@@ -1,0 +1,155 @@
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.Connection.Method;
+import org.jsoup.Connection.Response;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+//   readme 
+
+
+//getScheduleByTea方法会向目标网页发送查询请求，根据返回网页内容的长度判断是否发生验证码错误（验证码错误时长度固定991）
+//如果getScheduleByTea方法的返回值为-1，说明这时验证码错误了，那么再次调用该方法直至成功（成功返回网页内容实际长度）
+//为了方便测试，模拟了前五次失败（故意把验证码设错），后两次成功。相应的getScheduleByTea方法中也做了一些调整（可自行修改）
+
+//安卓端进行微调即可  主要是判断getScheduleByTea方法返回值   实现自动查询
+	public static void main(String[] args) {
+		try {
+			for(int i=0;i<7;i++) {
+				
+				if(getScheduleByTea(i)==-1) {
+					System.out.print("这次失败了            ");
+				}
+			}
+//	getValidateAndCookie();
+			
+////	webSpide();
+//		getScheduleByTea();
+//	parseHtml();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+public static int getScheduleByTea(int times)throws Exception{
+		
+		//先去把验证码图片存下来  并且拿到cookie
+		
+		getValidateAndCookie();
+		//对验证码中的图片进行识别
+		String username="qq563088";
+		String password="lzx1314520";
+		String softid="1e4318d5bf6608c2a403f97ea97d52bc";
+		String codetype="1902";
+		String filePath="k.png";
+		String len_min="0";
+		String getJ=(new ChaoJiYing().PostPic(username, password, softid, codetype, len_min, filePath));
+		String yzm="";
+		try {
+			JSONObject jsonObject=new JSONObject(getJ);
+//			System.out.println(jsonObject.get("pic_str")+"----->code");
+			 yzm=jsonObject.getString("pic_str");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//带着cookie和验证码进行真正的访问
+		//测试一下  第一次故意失败
+	
+		if(times<5) {
+			yzm="12";
+			
+			System.out.println("第"+times+"次   验证码故意失败");
+		}
+		else {
+			System.out.println("第"+times+"次   验证码故意成功");
+		}
+		
+		conf.load(new FileInputStream("conf.properties"));
+//		ASP.NET_SessionId=0relva55ynsptc45oeptmrje
+		String cookie=conf.getProperty("cookie");
+//				String cookie="ASP.NET_SessionId=0relva55ynsptc45oeptmrje";
+//		System.out.println(cookie);
+		String referer="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB.aspx";
+		String address="http://121.248.70.120/jwweb/ZNPK/TeacherKBFB_rpt.aspx";
+		URL url=new URL(address);
+		HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setRequestMethod("POST");
+		connection.setRequestProperty("Cookie", cookie);
+		connection.setRequestProperty("Referer", referer);
+		StringBuilder builder=new StringBuilder();
+		builder.append("Sel_XNXQ=20180&Sel_JS=0000315&type=1&txt_yzm="+yzm);
+		OutputStream outputStream=connection.getOutputStream();
+		outputStream.write(builder.toString().getBytes());
+		int len=connection.getContentLength();
+		int length_Content=len;
+//		System.out.println(len+"lenm");
+		if(len==991)return -1;
+		byte[]buf=new byte[512];
+		InputStream inputStream=connection.getInputStream();
+		OutputStream outputStream2=new FileOutputStream("aa1.txt");
+		while((len=inputStream.read(buf))!=-1)
+		{
+			outputStream2.write(buf, 0, len);
+			System.out.println(new String(buf,"GB2312"));
+		}
+		inputStream.close();
+		outputStream2.close();
+//		System.out.println("我从最后出来"+len);
+		return length_Content;
+	}
+
+
+	public static void getValidateAndCookie()throws Exception{
+		String address="http://121.248.70.120/jwweb/sys/ValidateCode.aspx?t=812";
+		URL url=new URL(address);
+		URLConnection connection=url.openConnection();
+		connection.setRequestProperty("Referer", "http://121.248.70.120/jwweb/ZNPK/TeacherKBFB.aspx");
+		connection.setDoInput(true);
+		connection.connect();
+		String cookie=connection.getHeaderField("Set-Cookie");
+//		System.out.println(cookie);
+		cookie=cookie.split(";")[0];
+//		System.out.println(cookie);
+		conf.setProperty("cookie", cookie);
+		conf.store(new FileOutputStream("conf.properties"), "comments");
+//		System.out.println(cookie.split("=")[0]);
+//		System.out.println(cookie);
+//		System.out.println(cookie.split("=")[1]);
+		byte[]buf=new byte[512];
+		InputStream inputStream=connection.getInputStream();
+		OutputStream outputStream=new FileOutputStream("k.png");
+		int len=0;
+		while((len=inputStream.read(buf))!=-1) {
+			outputStream.write(buf, 0, len);
+//			System.out.println(len);
+		}
+		inputStream.close();
+		outputStream.close();
+//		System.out.println("ok");
+	}
